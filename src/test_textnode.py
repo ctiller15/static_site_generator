@@ -35,25 +35,25 @@ class TestTextNodeToHTML(unittest.TestCase):
         self.assertEqual(result, "<code>test_text_code</code>")
         
     def test_text_link_node_no_url(self):
-        node = TextNode("test_text_link_no_url", TextType.LINKS)
+        node = TextNode("test_text_link_no_url", TextType.LINK)
         html_node = text_node_to_html_node(node)
         result = html_node.to_html()
         self.assertEqual(result, "<a href=\"\">test_text_link_no_url</a>")
 
     def test_text_link_node_with_url(self):
-        node = TextNode("test_text_link_no_url", TextType.LINKS, url="https://www.google.com")
+        node = TextNode("test_text_link_no_url", TextType.LINK, url="https://www.google.com")
         html_node = text_node_to_html_node(node)
         result = html_node.to_html()
         self.assertEqual(result, "<a href=\"https://www.google.com\">test_text_link_no_url</a>")
     
     def test_text_image_node_no_url(self):
-        node = TextNode("test_text_image_no_url", TextType.IMAGES)
+        node = TextNode("test_text_image_no_url", TextType.IMAGE)
         html_node = text_node_to_html_node(node)
         result = html_node.to_html()
         self.assertEqual(result, "<img href=\"\" alt=\"test_text_image_no_url\"/>")
     
     def test_text_image_node_with_url(self):
-        node = TextNode("test_text_image_no_url", TextType.IMAGES, url="https://www.google.com")
+        node = TextNode("test_text_image_no_url", TextType.IMAGE, url="https://www.google.com")
         html_node = text_node_to_html_node(node)
         result = html_node.to_html()
         self.assertEqual(result, "<img href=\"https://www.google.com\" alt=\"test_text_image_no_url\"/>")

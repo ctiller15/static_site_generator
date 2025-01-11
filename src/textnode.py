@@ -7,8 +7,8 @@ class TextType(Enum):
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
-    LINKS = "links"
-    IMAGES = "images"
+    LINK = "link"
+    IMAGE = "image"
 
 class TextNode():
     def __init__(self, text: str, text_type: TextType, url=None):
@@ -32,7 +32,7 @@ def text_node_to_html_node(text_node: TextNode) -> HTMLNode:
             return LeafNode("i", value=text_node.text)
         case TextType.CODE:
             return LeafNode("code", value=text_node.text)
-        case TextType.LINKS:
+        case TextType.LINK:
             return LeafNode("a", value=text_node.text, props={"href": text_node.url})
-        case TextType.IMAGES:
+        case TextType.IMAGE:
             return LeafNode("img", value="", props={"href": text_node.url, "alt": text_node.text})
