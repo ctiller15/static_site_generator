@@ -267,10 +267,19 @@ class TestBlockToBlockType(unittest.TestCase):
             with self.subTest(params=block):
                 self.assertEqual(block_to_block_type(block[0]), block[1])
 
+    def test_heading_fails_without_space(self):
+        block = "###h3"
+        self.assertEqual(block_to_block_type(block), "paragraph")
+
     def test_code_block(self):
         block = "```code goes here```"
 
         self.assertEqual(block_to_block_type(block), "code")
+    
+    def test_code_block_failure(self):
+        block = "`code_goes_here`"
+
+        self.assertEqual(block_to_block_type(block), "paragraph")
 
     def test_quote_block(self):
         block = """> This is a quote.
@@ -279,6 +288,21 @@ class TestBlockToBlockType(unittest.TestCase):
 
         self.assertEqual(block_to_block_type(block), "quote")
 
+    def test_quote_block_no_spaces(self):
+        block = """> This is a quote.
+>This is the second line of a quote.
+>This is the third line of a quote block."""
+
+        self.assertEqual(block_to_block_type(block), "quote")
+
+    def test_incorrect_quote_block(self):
+        block = """> This is a quote.
+> This is the second line of a quote.
+* insert secret wrong line!
+> This is the third line of a quote block."""
+
+        self.assertEqual(block_to_block_type(block), "paragraph")     
+
     def test_unordered_list_block(self):
         block = """* list item 1
 - list item with minus sign
@@ -286,3 +310,47 @@ class TestBlockToBlockType(unittest.TestCase):
 * another star!!!
 - aaaaaand another minus sign"""
         self.assertEqual(block_to_block_type(block), "unordered_list")
+
+    def test_unordered_list_block_no_spaces(self):
+        block = """* list item 1
+-list item with minus sign
+-another minus sign
+* another star!!!
+- aaaaaand another minus sign"""
+        self.assertEqual(block_to_block_type(block), "paragraph")
+
+    def test_unordered_list_block_no_spaces(self):
+        block = """* list item 1
+- list item with minus sign
+> another minus sign
+* another star!!!
+- aaaaaand another minus sign"""
+        self.assertEqual(block_to_block_type(block), "paragraph")
+
+    def test_ordered_list_block(self):
+        block = """1. item 1
+2. item 2
+3. item 3
+4. item 4
+5. item 5"""
+        self.assertEqual(block_to_block_type(block), "ordered_list")
+
+    def test_ordered_list_block_does_not_start_correctly(self):
+        block = """9. item 1
+2. item 2
+3. item 3
+4. item 4
+5. item 5"""
+        self.assertEqual(block_to_block_type(block), "paragraph")
+
+    def test_ordered_list_block_no_spaces(self):
+        block = """1. item 1
+2.item 2
+3. item 3
+4. item 4
+5. item 5"""
+        self.assertEqual(block_to_block_type(block), "paragraph")
+
+    def test_paragraph_block(self):
+        block = "fh3287h1238"
+        self.assertEqual(block_to_block_type(block), "paragraph")

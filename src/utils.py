@@ -99,6 +99,12 @@ def block_to_block_type(text_block: str):
     if text_block.startswith("#"):
         # it is a heading.
         split_heading = text_block.split(" ")
+        heading_hashes = split_heading[0]
+
+        # Assert that everything on the left side is an octothorpe
+        if heading_hashes != len(heading_hashes) * "#":
+            return "paragraph"
+        
         # assume that it is correctly formatted.
         return f"h{min(len(split_heading[0]), 6)}"
     elif text_block.startswith("```"):
@@ -123,4 +129,16 @@ def block_to_block_type(text_block: str):
 
         if is_ul:
             return "unordered_list"
+    elif text_block.startswith("1"):
+        lines = text_block.split("\n")
+        is_ol = True
+        for i, line in enumerate(lines, start=1):
+            if not line.startswith(f"{i}. "):
+                is_ol = False
+        
+        if is_ol:
+            return "ordered_list"
+        
+    # All conditions have fallen through. It is a normal paragraph.
+    return "paragraph"
             
