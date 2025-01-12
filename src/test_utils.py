@@ -1,7 +1,8 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import block_to_block_type, extract_markdown_images, extract_markdown_links, markdown_to_blocks, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
+from htmlnode import LeafNode, ParentNode, HTMLNode
+from utils import block_to_block_type, extract_markdown_images, extract_markdown_links, markdown_to_blocks, markdown_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_splits_old_node(self):
@@ -354,3 +355,99 @@ class TestBlockToBlockType(unittest.TestCase):
     def test_paragraph_block(self):
         block = "fh3287h1238"
         self.assertEqual(block_to_block_type(block), "paragraph")
+
+class TestMarkdownToHtmlNode(unittest.TestCase):
+    def test_converts_to_html_happy_path(self):
+        markdown_doc = """
+# Header
+
+paragraph text
+
+- list item 1
+- list item 2
+
+[link to boot.dev](https://www.boot.dev)
+
+![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg)
+
+*italics text*
+
+**bold text**
+"""
+
+        result = markdown_to_html_node(markdown_doc)
+        expected = ParentNode(tag="div", children=[
+            LeafNode(tag="h1", value="Header", props=None), 
+            ParentNode(tag="p", children=[TextNode("paragraph text", TextType.TEXT, None)]), 
+            ParentNode(tag="ul", children=[LeafNode(tag="li", value="list item 1", props=None), LeafNode(tag="li", value="list item 2", props=None)], props=None), 
+            ParentNode(tag="p", children=[TextNode("link to boot.dev", TextType.LINK, "https://www.boot.dev")], props=None), 
+            ParentNode(tag="p", children=[TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg")], props=None), 
+            ParentNode(tag="p", children=[TextNode("italics text", TextType.ITALIC, None)], props=None), 
+            ParentNode(tag="p", children=[TextNode("bold text", TextType.BOLD, None)], props=None)
+        ])
+
+        self.assertEqual(expected, result)
+
+    def test_handles_more_elements(self):
+        markdown_doc = """
+        # Header
+
+## Header Two
+
+### Header Three
+
+#### Header Four
+
+##### Header Five
+
+###### Header Six
+
+paragraph text
+
+1. list item 1
+2. list item 2
+3. list item 3
+4. list item 4
+5. list item 5
+
+```print("Hello World!")```
+
+>This is some quote text.
+>It keeps going.
+>Until I stop with the less than symbols.
+
+This is a paragraph with a mix of *italics* and **bold** text!
+"""
+
+        result = markdown_to_html_node(markdown_doc)
+        expected = ParentNode(tag="div", children=[
+            LeafNode(tag="h1", value="Header", props=None), 
+            LeafNode(tag="h2", value="Header Two", props=None), 
+            LeafNode(tag="h3", value="Header Three", props=None), 
+            LeafNode(tag="h4", value="Header Four", props=None), 
+            LeafNode(tag="h5", value="Header Five", props=None), 
+            LeafNode(tag="h6", value="Header Six", props=None),
+            ParentNode(tag="p", children=[
+                TextNode("paragraph text", TextType.TEXT, None)
+            ], props=None),
+            ParentNode(tag="ol", children=[
+                LeafNode(tag="li", value="list item 1", props=None),
+                LeafNode(tag="li", value="list item 2", props=None),
+                LeafNode(tag="li", value="list item 3", props=None),
+                LeafNode(tag="li", value="list item 4", props=None),
+                LeafNode(tag="li", value="list item 5", props=None),
+            ], props=None),
+            ParentNode(tag="pre", children=[
+                LeafNode(tag="code", value="print(\"Hello World!\")", props=None)
+            ]),
+            LeafNode(tag="blockquote", value="This is some quote text.\nIt keeps going.\nUntil I stop with the less than symbols.", props=None),
+            ParentNode(tag="p", children=[
+                TextNode("This is a paragraph with a mix of ", TextType.TEXT, None),
+                TextNode("italics", TextType.ITALIC, None),
+                TextNode(" and ", TextType.TEXT, None),
+                TextNode("bold", TextType.BOLD, None),
+                TextNode(" text!", TextType.TEXT, None)
+            ], props=None)
+        ], props=None)
+
+        self.assertEqual(result, expected)

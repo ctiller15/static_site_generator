@@ -1,3 +1,4 @@
+from htmlnode import LeafNode, ParentNode
 from textnode import TextNode, TextType
 import re
 
@@ -80,7 +81,7 @@ def split_nodes_link(old_nodes: list[TextNode]):
 
     return nodes_list
 
-def text_to_textnodes(text):
+def text_to_textnodes(text: str):
     nodes = [TextNode(text, TextType.TEXT)]
 
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
@@ -141,4 +142,43 @@ def block_to_block_type(text_block: str):
         
     # All conditions have fallen through. It is a normal paragraph.
     return "paragraph"
-            
+    
+def markdown_to_html_node(markdown: str):
+    child_nodes = []
+    split_markdown = markdown_to_blocks(markdown)
+    for block in split_markdown:
+        block_type = block_to_block_type(block)
+        # Can be broken out into another function
+        match block_type:
+            case "h1" | "h2" | "h3" | "h4" | "h5" | "h6":
+                text = block.split(" ", 1)[1]
+                new_node = LeafNode(block_type, text)
+                child_nodes.append(new_node)
+            case "paragraph":
+                # need to further split p tags depending on if they contain anything.
+                paragraph_text_nodes = text_to_textnodes(block)
+                parent_node = ParentNode("p", paragraph_text_nodes, None)
+                child_nodes.append(parent_node)
+            case "unordered_list":
+                lines = block.split("\n")
+                list_item_nodes = list(map(lambda x: LeafNode("li", x.split(" ", 1)[1]), lines))
+
+                parent_node = ParentNode("ul", list_item_nodes)
+                child_nodes.append(parent_node)
+            case "ordered_list":
+                lines = block.split("\n")
+                list_item_nodes = list(map(lambda x: LeafNode("li", x.split(" ", 1)[1]), lines))
+                parent_node = ParentNode("ol", list_item_nodes)
+                child_nodes.append(parent_node)
+            case "code":
+                text = block.lstrip("```").rstrip("```")
+                child_node = LeafNode("code", text, None)
+                parent_node = ParentNode("pre", [child_node], None)
+                child_nodes.append(parent_node)
+            case "quote":
+                lines = block.split("\n")
+                quote_tag_removed_text = "\n".join(list(map(lambda x: x[1:], lines)))
+                child_node = LeafNode("blockquote", quote_tag_removed_text, None)
+                child_nodes.append(child_node)
+
+    return ParentNode(tag="div", children=child_nodes)
