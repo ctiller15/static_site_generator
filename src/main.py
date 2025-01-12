@@ -24,8 +24,6 @@ def copy_directory(dir_name, target_dir_name):
 
 def main():
     copy_directory("static", "public")
-    textnode = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
-    print(textnode)
 
 if __name__ == "__main__":
     main()

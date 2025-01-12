@@ -182,3 +182,11 @@ def markdown_to_html_node(markdown: str):
                 child_nodes.append(child_node)
 
     return ParentNode(tag="div", children=child_nodes)
+
+def extract_title(markdown):
+    lines = markdown_to_blocks(markdown)
+    for line in lines:
+        if block_to_block_type(line) == "h1":
+            return line.split(" ", 1)[1]
+        
+    raise Exception("markdown does not contain a h1 block")

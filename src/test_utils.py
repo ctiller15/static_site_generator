@@ -2,7 +2,7 @@ import unittest
 
 from textnode import TextNode, TextType
 from htmlnode import LeafNode, ParentNode, HTMLNode
-from utils import block_to_block_type, extract_markdown_images, extract_markdown_links, markdown_to_blocks, markdown_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
+from utils import block_to_block_type, extract_markdown_images, extract_markdown_links, extract_title, markdown_to_blocks, markdown_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_splits_old_node(self):
@@ -451,3 +451,17 @@ This is a paragraph with a mix of *italics* and **bold** text!
         ], props=None)
 
         self.assertEqual(result, expected)
+
+class TestExtractTitle(unittest.TestCase):
+    def test_extracts_a_h1_tag(self):
+        result = extract_title("# Hello")
+        
+        self.assertEqual(result, "Hello")
+
+    def test_errors_if_no_header(self):
+        with self.assertRaises(Exception) as context:
+            result = extract_title("hello")
+
+        self.assertEqual(str(context.exception), "markdown does not contain a h1 block")
+
+        
