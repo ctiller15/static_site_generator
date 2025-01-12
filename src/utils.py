@@ -1,5 +1,5 @@
 from htmlnode import LeafNode, ParentNode
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, text_node_to_html_node
 import re
 
 
@@ -157,7 +157,7 @@ def markdown_to_html_node(markdown: str):
             case "paragraph":
                 # need to further split p tags depending on if they contain anything.
                 paragraph_text_nodes = text_to_textnodes(block)
-                parent_node = ParentNode("p", paragraph_text_nodes, None)
+                parent_node = ParentNode("p", list(map(text_node_to_html_node, paragraph_text_nodes)), None)
                 child_nodes.append(parent_node)
             case "unordered_list":
                 lines = block.split("\n")

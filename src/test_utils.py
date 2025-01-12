@@ -378,12 +378,12 @@ paragraph text
         result = markdown_to_html_node(markdown_doc)
         expected = ParentNode(tag="div", children=[
             LeafNode(tag="h1", value="Header", props=None), 
-            ParentNode(tag="p", children=[TextNode("paragraph text", TextType.TEXT, None)]), 
+            ParentNode(tag="p", children=[LeafNode(tag=None, value="paragraph text", props=None)]), 
             ParentNode(tag="ul", children=[LeafNode(tag="li", value="list item 1", props=None), LeafNode(tag="li", value="list item 2", props=None)], props=None), 
-            ParentNode(tag="p", children=[TextNode("link to boot.dev", TextType.LINK, "https://www.boot.dev")], props=None), 
-            ParentNode(tag="p", children=[TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg")], props=None), 
-            ParentNode(tag="p", children=[TextNode("italics text", TextType.ITALIC, None)], props=None), 
-            ParentNode(tag="p", children=[TextNode("bold text", TextType.BOLD, None)], props=None)
+            ParentNode(tag="p", children=[LeafNode(tag="a", value="link to boot.dev", props={"href": "https://www.boot.dev"})], props=None), 
+            ParentNode(tag="p", children=[LeafNode(tag="img", value="", props=({"href": "https://i.imgur.com/fJRm4Vk.jpeg", "alt": "obi wan image"}))], props=None), 
+            ParentNode(tag="p", children=[LeafNode(tag="i", value="italics text")], props=None), 
+            ParentNode(tag="p", children=[LeafNode(tag="b", value="bold text")], props=None)
         ])
 
         self.assertEqual(expected, result)
@@ -428,7 +428,7 @@ This is a paragraph with a mix of *italics* and **bold** text!
             LeafNode(tag="h5", value="Header Five", props=None), 
             LeafNode(tag="h6", value="Header Six", props=None),
             ParentNode(tag="p", children=[
-                TextNode("paragraph text", TextType.TEXT, None)
+                LeafNode(tag=None, value="paragraph text", props=None)
             ], props=None),
             ParentNode(tag="ol", children=[
                 LeafNode(tag="li", value="list item 1", props=None),
@@ -442,13 +442,19 @@ This is a paragraph with a mix of *italics* and **bold** text!
             ]),
             LeafNode(tag="blockquote", value="This is some quote text.\nIt keeps going.\nUntil I stop with the less than symbols.", props=None),
             ParentNode(tag="p", children=[
-                TextNode("This is a paragraph with a mix of ", TextType.TEXT, None),
-                TextNode("italics", TextType.ITALIC, None),
-                TextNode(" and ", TextType.TEXT, None),
-                TextNode("bold", TextType.BOLD, None),
-                TextNode(" text!", TextType.TEXT, None)
+                LeafNode(tag=None, value="This is a paragraph with a mix of ", props=None),
+                LeafNode(tag="i", value="italics", props=None),
+                LeafNode(tag=None, value=" and ", props=None),
+                LeafNode(tag="b", value="bold", props=None),
+                LeafNode(tag=None, value=" text!", props=None)
             ], props=None)
         ], props=None)
+
+        print("===")
+        print(expected)
+        print("$$$")
+        print(result)
+        print("===")
 
         self.assertEqual(result, expected)
 

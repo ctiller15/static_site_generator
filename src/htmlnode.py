@@ -40,7 +40,7 @@ class LeafNode(HTMLNode):
     def __repr__(self):
         return f"LeafNode(tag={self.tag}, value={self.value}, props={self.props})"
     
-    def __eq__(self, other):
+    def __eq__(self, other: 'LeafNode'):
         return self.tag == other.tag and self.value == other.value and self.props == other.props
 
 class ParentNode(HTMLNode):
@@ -63,4 +63,4 @@ class ParentNode(HTMLNode):
         return f"ParentNode(tag={self.tag}, children={self.children}, props={self.props})"
     
     def __eq__(self, other):
-        return self.tag == other.tag and self.props == other.props and self.children == other.children
+        return self.tag == other.tag and self.children == other.children and self.props == other.props 
