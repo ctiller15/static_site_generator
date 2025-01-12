@@ -357,6 +357,7 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_to_block_type(block), "paragraph")
 
 class TestMarkdownToHtmlNode(unittest.TestCase):
+    # TODO: Test nested values under ol/li
     def test_converts_to_html_happy_path(self):
         markdown_doc = """
 # Header
@@ -379,7 +380,10 @@ paragraph text
         expected = ParentNode(tag="div", children=[
             LeafNode(tag="h1", value="Header", props=None), 
             ParentNode(tag="p", children=[LeafNode(tag=None, value="paragraph text", props=None)]), 
-            ParentNode(tag="ul", children=[LeafNode(tag="li", value="list item 1", props=None), LeafNode(tag="li", value="list item 2", props=None)], props=None), 
+            ParentNode(tag="ul", children=[
+                ParentNode(tag="li", children=[LeafNode(tag=None, value="list item 1", props=None)]), 
+                ParentNode(tag="li", children=[LeafNode(tag=None, value="list item 2", props=None)]),
+            ]),
             ParentNode(tag="p", children=[LeafNode(tag="a", value="link to boot.dev", props={"href": "https://www.boot.dev"})], props=None), 
             ParentNode(tag="p", children=[LeafNode(tag="img", value="", props=({"href": "https://i.imgur.com/fJRm4Vk.jpeg", "alt": "obi wan image"}))], props=None), 
             ParentNode(tag="p", children=[LeafNode(tag="i", value="italics text")], props=None), 
@@ -412,9 +416,9 @@ paragraph text
 
 ```print("Hello World!")```
 
->This is some quote text.
->It keeps going.
->Until I stop with the less than symbols.
+> This is some quote text.
+> It keeps going.
+> Until I stop with the less than symbols.
 
 This is a paragraph with a mix of *italics* and **bold** text!
 """
@@ -431,11 +435,21 @@ This is a paragraph with a mix of *italics* and **bold** text!
                 LeafNode(tag=None, value="paragraph text", props=None)
             ], props=None),
             ParentNode(tag="ol", children=[
-                LeafNode(tag="li", value="list item 1", props=None),
-                LeafNode(tag="li", value="list item 2", props=None),
-                LeafNode(tag="li", value="list item 3", props=None),
-                LeafNode(tag="li", value="list item 4", props=None),
-                LeafNode(tag="li", value="list item 5", props=None),
+                ParentNode(tag="li", children=[
+                    LeafNode(tag=None, value="list item 1")
+                ]),
+                ParentNode(tag="li", children=[
+                    LeafNode(tag=None, value="list item 2")
+                ]),
+                ParentNode(tag="li", children=[
+                    LeafNode(tag=None, value="list item 3")
+                ]),
+                ParentNode(tag="li", children=[
+                    LeafNode(tag=None, value="list item 4")
+                ]),
+                ParentNode(tag="li", children=[
+                    LeafNode(tag=None, value="list item 5")
+                ]),
             ], props=None),
             ParentNode(tag="pre", children=[
                 LeafNode(tag="code", value="print(\"Hello World!\")", props=None)
@@ -449,12 +463,6 @@ This is a paragraph with a mix of *italics* and **bold** text!
                 LeafNode(tag=None, value=" text!", props=None)
             ], props=None)
         ], props=None)
-
-        print("===")
-        print(expected)
-        print("$$$")
-        print(result)
-        print("===")
 
         self.assertEqual(result, expected)
 

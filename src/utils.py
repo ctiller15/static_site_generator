@@ -161,13 +161,25 @@ def markdown_to_html_node(markdown: str):
                 child_nodes.append(parent_node)
             case "unordered_list":
                 lines = block.split("\n")
-                list_item_nodes = list(map(lambda x: LeafNode("li", x.split(" ", 1)[1]), lines))
+                line_textnodes = list(map(lambda x: text_to_textnodes(x.split(" ", 1)[1]), lines))
+                # list of lists
+                converted_children = list(map(lambda x: list(map(text_node_to_html_node, x)), line_textnodes))
+                
+                list_item_nodes = list(map(lambda x: ParentNode("li", x), converted_children))
 
                 parent_node = ParentNode("ul", list_item_nodes)
                 child_nodes.append(parent_node)
             case "ordered_list":
                 lines = block.split("\n")
-                list_item_nodes = list(map(lambda x: LeafNode("li", x.split(" ", 1)[1]), lines))
+
+                line_textnodes = list(map(lambda x: text_to_textnodes(x.split(" ", 1)[1]), lines))
+                # list of lists
+                converted_children = list(map(lambda x: list(map(text_node_to_html_node, x)), line_textnodes))
+                
+                list_item_nodes = list(map(lambda x: ParentNode("li", x), converted_children))
+
+
+                # list_item_nodes = list(map(lambda x: LeafNode("li", x.split(" ", 1)[1]), lines))
                 parent_node = ParentNode("ol", list_item_nodes)
                 child_nodes.append(parent_node)
             case "code":
@@ -177,7 +189,7 @@ def markdown_to_html_node(markdown: str):
                 child_nodes.append(parent_node)
             case "quote":
                 lines = block.split("\n")
-                quote_tag_removed_text = "\n".join(list(map(lambda x: x[1:], lines)))
+                quote_tag_removed_text = "\n".join(list(map(lambda x: x.split(" ", 1)[1], lines)))
                 child_node = LeafNode("blockquote", quote_tag_removed_text, None)
                 child_nodes.append(child_node)
 
