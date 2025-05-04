@@ -1,0 +1,1 @@
+python3 src/main.py "/https://github.com/ctiller15/static_site_generator/"
